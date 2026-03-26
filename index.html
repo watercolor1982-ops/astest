@@ -8,49 +8,33 @@
         body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; background: #f0f4f8; padding: 20px; color: #333; line-height: 1.6; }
         .card { max-width: 650px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
         h1 { text-align: center; color: #1a73e8; font-size: 1.4em; border-bottom: 2px solid #eef2f7; padding-bottom: 15px; margin-bottom: 20px; }
-        
-        /* 利益上限バナー */
         .info-banner { background: #e8f0fe; border-left: 5px solid #1a73e8; padding: 15px; border-radius: 4px; margin-bottom: 20px; font-size: 0.9em; }
         .max-profit-val { font-size: 1.2em; font-weight: bold; color: #1a73e8; }
-
-        /* 入力エリア */
         .section-title { font-weight: bold; margin-bottom: 10px; font-size: 0.95em; color: #1a73e8; border-bottom: 1px solid #eef2f7; padding-bottom: 5px; }
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         .group { display: flex; flex-direction: column; }
         .full { grid-column: span 2; }
         label { font-size: 0.85em; font-weight: bold; margin-bottom: 5px; color: #666; }
         select, input { padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 1em; background: #fff; outline: none; }
-        select:focus, input:focus { border-color: #1a73e8; }
-        
-        /* 運用モデル解説 */
-        .logic-box { background: #fafafa; padding: 15px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 25px; font-size: 0.85em; }
-        .logic-row { display: flex; justify-content: space-between; margin-bottom: 4px; color: #555; }
-        .logic-total { border-top: 1px solid #ddd; margin-top: 8px; padding-top: 5px; font-weight: bold; color: #333; }
-
-        /* 結果エリア */
-        .res-container { padding: 20px; border-radius: 12px; background: #fff; border: 2px solid #1a73e8; }
+        .res-container { padding: 20px; border-radius: 12px; background: #fff; border: 2px solid #1a73e8; margin-top: 10px; }
         .bank-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
         .bank-box { padding: 15px; border-radius: 8px; background: #f8f9fa; border-top: 4px solid #1a73e8; }
         .bank-box.red { border-top-color: #e74c3c; }
         .val { font-size: 1.25em; font-weight: bold; display: block; margin-top: 5px; }
         .sub-val { font-size: 0.75em; color: #888; display: block; margin-top: 4px; }
-        
-        /* エラーメッセージ */
         .error-msg { background: #fee; color: #c00; padding: 15px; border-radius: 8px; border: 1px solid #fcc; margin-top: 20px; display: none; text-align: center; font-weight: bold; }
-        
         .rate-status { font-size: 0.7em; color: #999; text-align: right; margin-top: 5px; }
     </style>
 </head>
 <body>
-
 <div class="card">
     <h1>AS資産配分シミュレーター</h1>
 
     <div class="info-banner">
         現在の設定での月利上限（1通貨ペア）:<br>
         <span class="max-profit-val" id="maxProfitDisplay">0</span> <span class="max-profit-val">円 / 月</span>
-        <div id="disclaimer" style="font-size: 0.8em; color: #555; margin-top: 5px;">
-            ※標準運用モデル（月～水新規エントリー、1日5回、週末一括決済）に基づき、マニュアル規定の1回0.12Lot上限で算出
+        <div style="font-size: 0.8em; color: #555; margin-top: 5px;">
+            ※マニュアル規定（1回0.12Lot・1日5回・月火水仕込み）時の理論値
         </div>
     </div>
 
@@ -81,22 +65,11 @@
         </div>
     </div>
 
-    <div class="section-title">標準運用モデルの前提</div>
-    <div class="logic-box">
-        <div class="logic-row"><span>月曜：5回エントリー → 金曜決済</span><span>6日分</span></div>
-        <div class="logic-row"><span>火曜：5回エントリー → 金曜決済</span><span>5日分</span></div>
-        <div class="logic-row"><span>水曜：5回エントリー → 金曜決済 (3倍含)</span><span>4日分</span></div>
-        <div class="logic-row"><span>木曜・金曜：新規エントリーなし（保有のみ）</span><span>-</span></div>
-        <div class="logic-row logic-total">
-            <span>週あたりの合計スワップ発生日数</span>
-            <span>計 75日分 (0.1Lot換算)</span>
-        </div>
-    </div>
-
     <div id="resultArea">
+        <div class="section-title">算出された運用設定</div>
         <div class="res-container">
             <div style="text-align:center; margin-bottom: 20px;">
-                <div style="font-size:0.85em; color:#666;">設定すべき1回あたりのロット</div>
+                <div style="font-size:0.85em; color:#666;">推奨：1回あたりのエントリーロット</div>
                 <div style="font-size:2em; font-weight:bold; color:#1a73e8;"><span id="lotPerEntry">0.00</span> Lot</div>
                 <div style="font-size:0.85em; color:#999; margin-top:5px;">(最大合計保有量: <span id="maxLots">0.00</span> Lot)</div>
             </div>
@@ -121,9 +94,9 @@
         <span style="font-size: 0.8em; font-weight: normal;">この利益を狙うには、スワップの高い業者を選ぶか、通貨ペアを増やす必要があります。</span>
     </div>
 
-    <div style="font-size: 0.7em; color: #999; margin-top: 20px; text-align: center;">
-        ※本ツールはtaya氏の収益モデルに基づき、証拠金と変動バッファの合算を算出するものです。<br>
-        実際の運用結果や損失を保証するものではありません。
+    <div style="font-size: 0.7em; color: #999; margin-top: 25px; text-align: center;">
+        ※計算根拠：月〜水に各5回エントリー、金曜夜に一括決済する標準モデルに基づきます。<br>
+        実際の運用結果を保証するものではありません。
     </div>
 </div>
 
@@ -135,9 +108,7 @@
             document.getElementById('rate').value = data.rates.JPY.toFixed(2);
             document.getElementById('rateStatus').innerText = "最終更新: " + data.date;
             calc();
-        } catch (e) {
-            document.getElementById('rateStatus').innerText = "レート自動取得に失敗しました。手入力してください。";
-        }
+        } catch (e) { document.getElementById('rateStatus').innerText = "自動取得失敗"; }
     }
 
     function calc() {
@@ -146,20 +117,17 @@
         const vol = parseFloat(document.getElementById('vol').value);
         const rate = parseFloat(document.getElementById('rate').value);
 
-        // 利益上限の算出 (0.12Lot上限・週15日分・5エントリー・4週間)
+        // 上限利益の計算
         const maxMonthly = (0.12 * 5 * 15 * (swap / 0.1)) * 4;
         document.getElementById('maxProfitDisplay').innerText = Math.floor(maxMonthly).toLocaleString();
 
         // 必要ロットの計算
         const weeklyTarget = target / 4;
-        const weeklyProfitPer01Lot = swap * 7.5; 
+        const weeklyProfitPer01Lot = swap * 7.5; // 0.1Lot設定時の週利
         const lotPerEntry = (weeklyTarget / (weeklyProfitPer01Lot * 10)) * 0.1;
-        
-        // 合計ロットとユニット数
-        const maxLots = lotPerEntry * 5 * 3;
+        const maxLots = lotPerEntry * 15;
         const units = maxLots * 100000;
 
-        // 上限チェック
         if (lotPerEntry > 0.12) {
             document.getElementById('resultArea').style.display = 'none';
             document.getElementById('errorArea').style.display = 'block';
@@ -167,23 +135,16 @@
             document.getElementById('resultArea').style.display = 'block';
             document.getElementById('errorArea').style.display = 'none';
 
-            // 資金計算
             const buffer = units * vol;
-            const marginXM = (units * rate) / 1000;
-            const marginRakuten = (units * rate) / 25;
-
-            // 表示反映
             document.getElementById('lotPerEntry').innerText = lotPerEntry.toFixed(3);
             document.getElementById('maxLots').innerText = maxLots.toFixed(2);
             document.getElementById('xmBuffer').innerText = Math.round(buffer).toLocaleString();
-            document.getElementById('xmTotal').innerText = Math.round(marginXM + buffer).toLocaleString() + " 円";
+            document.getElementById('xmTotal').innerText = Math.round((units * rate / 1000) + buffer).toLocaleString() + " 円";
             document.getElementById('rakutenBuffer').innerText = Math.round(buffer).toLocaleString();
-            document.getElementById('rakutenTotal').innerText = Math.round(marginRakuten + buffer).toLocaleString() + " 円";
+            document.getElementById('rakutenTotal').innerText = Math.round((units * rate / 25) + buffer).toLocaleString() + " 円";
         }
     }
-
     fetchRate();
 </script>
-
 </body>
 </html>
