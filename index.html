@@ -23,7 +23,6 @@
         }
         h1 { text-align: left; color: var(--accent-gold); font-size: 1.3em; margin-bottom: 20px; letter-spacing: 1px; }
 
-        /* 前提条件バナー */
         .info-banner {
             background: rgba(255, 255, 255, 0.03); border-left: 4px solid var(--accent-gold);
             padding: 15px; border-radius: 6px; margin-bottom: 25px;
@@ -31,12 +30,12 @@
         .banner-label { font-size: 0.85em; color: var(--text-sub); margin-bottom: 5px; display: block; }
         .max-profit-val { font-size: 1.4em; font-weight: bold; color: var(--accent-gold); }
         
+        /* 修正：白太文字での強調 + 日数明記 */
         .condition-note { font-size: 0.85em; color: #777; margin-top: 10px; line-height: 1.5; }
         .condition-note strong { color: #ffffff; font-weight: bold; }
 
         .section-title { font-weight: bold; margin-bottom: 15px; font-size: 0.95em; color: var(--accent-gold); border-bottom: 1px solid #222; padding-bottom: 5px; text-align: left; }
 
-        /* 入力エリア */
         .input-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 25px; }
         @media (min-width: 500px) { .input-grid { grid-template-columns: 1fr 1fr; } }
         
@@ -60,7 +59,6 @@
         }
         .m-btn:active { background: #444; }
 
-        /* 結果エリア */
         .res-container { 
             padding: 20px; border-radius: 12px; background: #050505; 
             border: 1px solid var(--accent-gold); margin-top: 10px;
@@ -78,7 +76,6 @@
         .error-msg { background: rgba(192, 0, 0, 0.1); color: #ff6b6b; padding: 15px; border-radius: 8px; border: 1px solid #c00; margin-top: 20px; display: none; text-align: center; font-weight: bold; }
         .rate-status { font-size: 0.7em; color: #555; text-align: left; margin-top: 5px; }
 
-        /* 指定：備考欄を白色・太字なしに変更 */
         .footer-note { 
             font-size: 0.75em; color: #ffffff; font-weight: normal;
             text-align: left; margin-top: 25px; line-height: 1.6; 
@@ -93,14 +90,14 @@
         <span class="banner-label">この設定での収益限界（月利上限）:</span>
         <span class="max-profit-val" id="maxProfitDisplay">0</span> <span class="max-profit-val">円 / 月</span>
         <div class="condition-note">
-            ※<strong>標準運用モデル（月～水新規エントリー、1日5ポジション、週末一括決済）</strong>に基づき、マニュアル規定の1回0.12Lot上限前提で算出
+            ※<strong>標準運用モデル（月～水新規エントリー、1日5ポジション、保有日数：月5・火4・水3→金曜夜に一括決済）</strong>に基づき、マニュアル規定の1回0.12Lot上限前提で算出
         </div>
     </div>
 
     <div class="section-title">条件設定</div>
     <div class="input-grid">
         <div class="group full">
-            <label>目標とする月の利益（1,000円刻み）</label>
+            <label>目標とする月の利益（1,000円単位）</label>
             <div class="num-in-wrap">
                 <input type="number" id="target" value="30000" oninput="calc()">
                 <div class="btn-stack">
@@ -172,7 +169,7 @@
     </div>
 
     <div class="footer-note">
-        ※本シミュレーションはスワップ益のみを算出した理論値です。実際には決済時のスプレッドや、ダミートレードによる損益差分等により、算出額を下回ります。<br>
+        ※本シミュレーションはスワップ益のみを算出した理論値です。実際には決済時のスプレッドや、ダミートレードによる損益差分等により、算出額をある程度下回ります。<br>
         ※実際の運用結果を保証するものではありません。
     </div>
 </div>
@@ -206,12 +203,14 @@
         const vol = parseFloat(document.getElementById('vol').value) || 0;
         const rate = parseFloat(document.getElementById('rate').value) || 0;
 
-        const weeklyProfitMax = (0.12 / 0.1) * swap * 90;
+        // 【たやさん標準モデル】週75スワップカウント（月5・火4・水3）
+        const weeklyProfitMax = (0.12 / 0.1) * swap * 75;
         const maxMonthly = weeklyProfitMax * 4;
         document.getElementById('maxProfitDisplay').innerText = Math.floor(maxMonthly).toLocaleString();
 
         const weeklyTarget = target / 4;
-        const lotPerEntry = (weeklyTarget / (90 * (swap / 0.1)));
+        // 推奨ロット算出：週75回分のスワップ益で週目標を割る
+        const lotPerEntry = (weeklyTarget / (75 * (swap / 0.1)));
         const maxLots = lotPerEntry * 15;
         const units = maxLots * 100000;
 
@@ -225,10 +224,8 @@
             const buffer = units * vol;
             document.getElementById('lotPerEntry').innerText = lotPerEntry.toFixed(3);
             document.getElementById('maxLots').innerText = maxLots.toFixed(2);
-            
             document.getElementById('xmBuffer').innerText = Math.round(buffer).toLocaleString();
             document.getElementById('xmTotal').innerText = Math.round((units * rate / 1000) + buffer).toLocaleString() + " 円";
-            
             document.getElementById('rakutenBuffer').innerText = Math.round(buffer).toLocaleString();
             document.getElementById('rakutenTotal').innerText = Math.round((units * rate / 25) + buffer).toLocaleString() + " 円";
         }
